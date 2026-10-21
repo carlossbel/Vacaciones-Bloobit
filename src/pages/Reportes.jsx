@@ -66,10 +66,9 @@ export default function Reportes() {
 
   return (
     <div className="space-y-5">
-      <div className="sec-hd">
-        <span className="sec-num">6.</span>
-        <span className="sec-title">Reportes</span>
-      </div>
+      <h2 className="font-serif text-[20px] mb-3 pb-1.5 border-b border-rule-strong">
+        Reportes
+      </h2>
 
       {/* Selector de reporte */}
       <div className="flex gap-2 flex-wrap items-end bg-paper border border-rule p-4">
@@ -139,6 +138,7 @@ function ReporteSaldos({ resumen, corte }) {
     generados: calc.D,
     tomados: calc.E,
     devengado: Math.round(calc.H * 100) / 100,
+    tomable: calc.tomable,
     saldo: Math.round(calc.K * 100) / 100,
   }));
   return (
@@ -155,10 +155,11 @@ function ReporteSaldos({ resumen, corte }) {
               <th>No.</th><th>Nombre</th><th>Ingreso</th>
               <th className="num-c">Antig.</th>
               <th className="num-c">LFT año</th>
-              <th className="num-c">Generados (D)</th>
-              <th className="num-c">Tomados (E)</th>
-              <th className="num-c">Devengado (H)</th>
-              <th className="num-c">Saldo (K)</th>
+              <th className="num-c">Generados</th>
+              <th className="num-c">Tomados</th>
+              <th className="num-c">Devengado</th>
+              <th className="num-c">Tomable</th>
+              <th className="num-c">Saldo total</th>
             </tr>
           </thead>
           <tbody>
@@ -172,7 +173,10 @@ function ReporteSaldos({ resumen, corte }) {
                 <td className="num-c">{r.generados}</td>
                 <td className="num-c">{r.tomados}</td>
                 <td className="num">{fmtNum1(r.devengado)}</td>
-                <td className={`num font-semibold ${r.saldo < 0 ? 'text-bad' : 'text-ok'}`}>
+                <td className={`num font-semibold ${r.tomable < 0 ? 'text-bad' : 'text-ok'}`}>
+                  {r.tomable}
+                </td>
+                <td className={`num ${r.saldo < 0 ? 'text-bad' : ''}`}>
                   {fmtNum1(r.saldo)}
                 </td>
               </tr>

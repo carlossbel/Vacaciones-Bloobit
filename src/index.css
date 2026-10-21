@@ -153,7 +153,8 @@
 }
 
 /* ────────────────────────────────────────────────────────────
-   Impresión — forzar paleta clara al imprimir, aun en dark
+   Impresión — forzar paleta clara al imprimir, aun en dark;
+   simplificar layout para que el kardex quepa en una hoja carta.
    ──────────────────────────────────────────────────────────── */
 @media print {
   :root, :root[data-theme="dark"] {
@@ -174,10 +175,38 @@
     --c-warn:        #96530e;
     --c-bad:         #a52424;
   }
-  body { background: #fff !important; }
+
+  html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+
+  /* Resetear el shell: sin flex, sin padding, al ancho de la hoja */
+  body > #root { display: block !important; }
+  body > #root > div { display: block !important; }
+  body > #root > div > div { display: block !important; }
+  main { padding: 0 !important; margin: 0 !important; background: #fff !important; }
+  main > div { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+
   .no-print { display: none !important; }
   .print-only { display: block !important; }
-  .kardex-doc { border: none !important; max-width: 100% !important; }
+
+  /* El documento del kardex ocupa toda la hoja y nunca se parte entre secciones */
+  .kardex-doc {
+    border: 1px solid #000 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    page-break-inside: auto;
+    box-shadow: none !important;
+  }
+  .kardex-doc header,
+  .kardex-doc section {
+    page-break-inside: avoid;
+  }
+  .kardex-doc > header { page-break-after: avoid; }
+
+  /* Evitar que una tabla se parta por la mitad */
+  table { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr    { page-break-inside: avoid; page-break-after: auto; }
+
   @page { margin: 1.5cm; size: letter; }
 }
 .print-only { display: none; }

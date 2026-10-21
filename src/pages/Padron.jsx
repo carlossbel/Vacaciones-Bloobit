@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCollection } from '../hooks/useCollection';
 import { useConfig } from '../hooks/useConfig';
+import { useAuth } from '../context/AuthContext';
 import { resumenPadron, clasificarSaldo } from '../lib/calc';
 import { fmtDate, fmtNum1 } from '../lib/format';
 import Modal from '../components/Modal';
@@ -11,6 +12,7 @@ export default function Padron() {
   const { data: empleados, loading: le } = useCollection('empleados', 'no');
   const { data: historial, loading: lh } = useCollection('historial');
   const { config } = useConfig();
+  const { canWrite } = useAuth();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
 
@@ -36,47 +38,44 @@ export default function Padron() {
   return (
     <div className="space-y-6">
       <section>
-        <div className="sec-hd">
-          <span className="sec-num">1.</span>
-          <span className="sec-title">Objeto</span>
-        </div>
+        <h2 className="font-serif text-[20px] mb-1">Objeto</h2>
         <p className="text-[13px] text-ink-soft max-w-[70ch]">
           Registro individual y colectivo del saldo de vacaciones de los colaboradores
-          de Bloobit México, con base en la antigüedad y la tabla LFT Art. 76
-          (pre-reforma hasta 2022, reforma DOF 27-12-2022 en adelante). Fórmula
-          cotejada contra el reporte oficial de CONTPAQi.
+          de Bloobit México, con base en la antigüedad y la tabla LFT Art. 76. Las cifras
+          se validan contra el kárdex oficial de CONTPAQi Nóminas.
         </p>
       </section>
 
       <section>
-        <div className="sec-hd">
-          <span className="sec-num">2.</span>
-          <span className="sec-title">Resumen al corte</span>
-          <span className="sec-note font-mono">{fmtDate(config.corte)}</span>
+        <div className="flex items-baseline justify-between mb-3 pb-1.5 border-b border-rule-strong">
+          <h2 className="font-serif text-[20px]">Resumen al corte</h2>
+          <span className="text-[11px] text-ink-faint font-mono">{fmtDate(config.corte)}</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <KPI label="Colaboradores" value={resumen.total} />
           <KPI label="Con saldo positivo" value={resumen.conSaldoPositivo}
                sub={`${resumen.total - resumen.conSaldoPositivo} sin o excedidos`} />
-          <KPI label="Excedidos (K < 0)" value={resumen.excedidos} tone="bad" />
-          <KPI label="Promedio disp." value={fmtNum1(resumen.promedio)} sub="días por colaborador" />
+          <KPI label="Excedidos" value={resumen.excedidos} tone="bad" />
+          <KPI label="Promedio disponibles" value={fmtNum1(resumen.promedio)} sub="días por colaborador" />
         </div>
       </section>
 
       <section>
-        <div className="sec-hd">
-          <span className="sec-num">3.</span>
-          <span className="sec-title">Padrón de colaboradores</span>
-          <span className="sec-note">{resumen.total} activos</span>
+        <div className="flex items-baseline justify-between mb-3 pb-1.5 border-b border-rule-strong">
+          <h2 className="font-serif text-[20px]">Padrón de colaboradores</h2>
+          <span className="text-[11px] text-ink-faint">{resumen.total} activos</span>
         </div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
           <p className="text-[12px] text-ink-faint max-w-[55ch]">
-            <strong>Tomable</strong> = días ya cerrados por aniversarios (D − E), lo que puede tomar hoy.&nbsp;
-            <strong>Saldo (K)</strong> = Saldo total CONTPAQi (D + H − E), incluye lo que se devengará este año.
+            Haz clic en un colaborador para abrir su kardex. <strong>Tomable</strong> es
+            lo que puede tomar hoy. <strong>Saldo total</strong> incluye lo que se devengará
+            durante el año en curso.
           </p>
-          <button className="btn-primary" onClick={() => setShowForm(true)}>
-            + Registrar vacaciones
-          </button>
+          {canWrite && (
+            <button className="btn-primary" onClick={() => setShowForm(true)}>
+              + Registrar vacaciones
+            </button>
+          )}
         </div>
         <div className="tbl-wrap">
           <table className="data">
@@ -85,12 +84,11 @@ export default function Padron() {
                 <th>No.</th>
                 <th>Nombre</th>
                 <th>Fecha de ingreso</th>
-                <th className="num-c">Antig.</th>
+                <th className="num-c">Antigüedad</th>
                 <th className="num-c">LFT año</th>
-                <th className="num-c">Devengado</th>
                 <th className="num-c">Tomados año</th>
-                <th className="num-c" title="D − E · Lo que puede tomar HOY sin pedir prestado del año en curso">Tomable</th>
-                <th className="num-c" title="D + H − E · Saldo total CONTPAQi (incluye prorrateo)">Saldo (K)</th>
+                <th className="num-c">Tomable</th>
+                <th className="num-c">Saldo total</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +103,6 @@ export default function Padron() {
                     <td className="font-mono text-[12px]">{fmtDate(empleado.ingreso)}</td>
                     <td className="num-c">{calc.F}</td>
                     <td className="num-c">{calc.G}</td>
-                    <td className="num">{fmtNum1(calc.H)}</td>
                     <td className="num-c">{calc.I}</td>
                     <td className={`num-c font-semibold text-${clsT === 'ok' ? 'ok' : clsT === 'warn' ? 'warn' : 'bad'}`}>
                       {calc.tomable}
@@ -117,8 +114,8 @@ export default function Padron() {
                 );
               })}
               {resumen.total === 0 && (
-                <tr><td colSpan={9} className="text-center text-ink-faint py-4">
-                  No hay colaboradores. Ve a <strong>Administración</strong> para sembrar los datos.
+                <tr><td colSpan={8} className="text-center text-ink-faint py-4">
+                  No hay colaboradores. Agrégalos en <strong>Administración</strong>.
                 </td></tr>
               )}
             </tbody>
