@@ -73,8 +73,11 @@ export default function Kardex() {
 
 function KardexDocument({ empleado, calc, corte }) {
   const kC = clasificarSaldo(calc.K);
+  const tC = clasificarSaldo(calc.tomable);
+  const toneClass = (c) => c === 'ok' ? 'text-ok' : c === 'warn' ? 'text-warn' : 'text-bad';
+  const colorK = toneClass(kC);
+  const colorT = toneClass(tC);
   const emision = new Date();
-  const colorK = kC === 'ok' ? 'text-ok' : kC === 'warn' ? 'text-warn' : 'text-bad';
 
   const Row = ({ label, value }) => (
     <div className="grid grid-cols-[160px_1fr] border-b border-rule-soft">
@@ -145,11 +148,12 @@ function KardexDocument({ empleado, calc, corte }) {
       </div>
 
       {/* Saldos */}
-      <div className="grid grid-cols-2 md:grid-cols-4 border-y border-rule">
+      <div className="grid grid-cols-2 md:grid-cols-5 border-y border-rule">
         <Saldo label="LFT año (G)"  value={calc.G}            sub="Techo del año" />
         <Saldo label="Devengado (H)" value={fmtNum1(calc.H)}  sub="Prorrateado" borderL />
         <Saldo label="Tomados (I)"  value={calc.I}            sub="En el aniversario" borderL />
-        <Saldo label="Saldo (K)" value={fmtNum1(calc.K)}      sub="D + H − E" borderL cls={colorK} />
+        <Saldo label="Tomable"      value={calc.tomable}      sub="D − E · puede tomar hoy" borderL cls={colorT} />
+        <Saldo label="Saldo (K)"    value={fmtNum1(calc.K)}   sub="D + H − E · CONTPAQi" borderL cls={colorK} />
       </div>
 
       {/* Vacaciones del año */}

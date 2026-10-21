@@ -70,8 +70,9 @@ export default function Padron() {
           <span className="sec-note">{resumen.total} activos</span>
         </div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-[12px] text-ink-faint">
-            Haz clic en un colaborador para abrir su kardex.
+          <p className="text-[12px] text-ink-faint max-w-[55ch]">
+            <strong>Tomable</strong> = días ya cerrados por aniversarios (D − E), lo que puede tomar hoy.&nbsp;
+            <strong>Saldo (K)</strong> = Saldo total CONTPAQi (D + H − E), incluye lo que se devengará este año.
           </p>
           <button className="btn-primary" onClick={() => setShowForm(true)}>
             + Registrar vacaciones
@@ -88,12 +89,14 @@ export default function Padron() {
                 <th className="num-c">LFT año</th>
                 <th className="num-c">Devengado</th>
                 <th className="num-c">Tomados año</th>
-                <th className="num-c">Saldo (K)</th>
+                <th className="num-c" title="D − E · Lo que puede tomar HOY sin pedir prestado del año en curso">Tomable</th>
+                <th className="num-c" title="D + H − E · Saldo total CONTPAQi (incluye prorrateo)">Saldo (K)</th>
               </tr>
             </thead>
             <tbody>
               {resumen.filas.map(({ empleado, calc }) => {
-                const cls = clasificarSaldo(calc.K);
+                const clsK = clasificarSaldo(calc.K);
+                const clsT = clasificarSaldo(calc.tomable);
                 return (
                   <tr key={empleado.id} className="clickable"
                       onClick={() => navigate(`/kardex?e=${encodeURIComponent(empleado.nombre)}`)}>
@@ -104,14 +107,17 @@ export default function Padron() {
                     <td className="num-c">{calc.G}</td>
                     <td className="num">{fmtNum1(calc.H)}</td>
                     <td className="num-c">{calc.I}</td>
-                    <td className={`num-c font-semibold text-${cls === 'ok' ? 'ok' : cls === 'warn' ? 'warn' : 'bad'}`}>
+                    <td className={`num-c font-semibold text-${clsT === 'ok' ? 'ok' : clsT === 'warn' ? 'warn' : 'bad'}`}>
+                      {calc.tomable}
+                    </td>
+                    <td className={`num-c text-${clsK === 'ok' ? 'ok' : clsK === 'warn' ? 'warn' : 'bad'}`}>
                       {fmtNum1(calc.K)}
                     </td>
                   </tr>
                 );
               })}
               {resumen.total === 0 && (
-                <tr><td colSpan={8} className="text-center text-ink-faint py-4">
+                <tr><td colSpan={9} className="text-center text-ink-faint py-4">
                   No hay colaboradores. Ve a <strong>Administración</strong> para sembrar los datos.
                 </td></tr>
               )}

@@ -184,8 +184,13 @@ export function calcularVacaciones(empleado, corte, historial = [], corteKardex 
     .sort((a, b) => parseDate(a.inicio) - parseDate(b.inicio));
   const I = histAnio.reduce((s, h) => s + (Number(h.dias) || 0), 0);
 
-  // K — SALDO disponible (fórmula CONTPAQi)
+  // K — SALDO disponible (fórmula CONTPAQi, incluye prorrateo del año en curso)
   const K = D + H - E;
+
+  // TOMABLE — solo los días ya cerrados por aniversarios cumplidos (D − E).
+  // Representa lo que el colaborador PUEDE tomar HOY sin "pedir prestado"
+  // del año en curso que aún no termina de devengarse.
+  const tomable = D - E;
 
   // Prima vacacional (base — multiplicar por salario diario para pesos)
   const primaVacacional = G * PRIMA_VACACIONAL_MIN;
@@ -198,6 +203,7 @@ export function calcularVacaciones(empleado, corte, historial = [], corteKardex 
     H,
     I,
     K,
+    tomable,
     anivStart,
     anivEnd,
     diasTranscurridos,
@@ -205,6 +211,7 @@ export function calcularVacaciones(empleado, corte, historial = [], corteKardex 
     histEmp,
     primaVacacional,
     excedido: K < 0,
+    sinTomable: tomable <= 0,
   };
 }
 

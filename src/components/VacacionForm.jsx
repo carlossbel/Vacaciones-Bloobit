@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { collection, addDoc, updateDoc, doc, serverTimestamp, db, COL } from '../firebase';
+import { useCollection } from '../hooks/useCollection';
+import { useConfig } from '../hooks/useConfig';
+import { calcularVacaciones } from '../lib/calc';
 
 /** Cuenta días hábiles (L–V) entre dos fechas inclusive, excluyendo sábado/domingo. */
 function diasHabilesEntre(inicio, fin) {
@@ -29,6 +32,21 @@ export default function VacacionForm({ empleados, registro, onDone }) {
   const [autoDias, setAutoDias] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  // Para validar contra el saldo tomable del colaborador seleccionado
+  const { data: historial } = useCollection('historial');
+  const { config } = useConfig();
+  const calcSel = useMemo(() => {
+    const emp = empleados.find((e) => e.nombre === form.nombre);
+    if (!emp) return null;
+    return calcularVacaciones(emp, config.corte, historial);
+  }, [form.nombre, empleados, historial, config.corte]);
+
+  // Si está editando, el día que ya tenía ese registro no se cuenta contra el tope
+  const diasPrevios = isEdit ? Number(registro?.dias) || 0 : 0;
+  const tomableEfectivo = calcSel ? calcSel.tomable + diasPrevios : null;
+  const excede =
+    tomableEfectivo !== null && Number(form.dias) > tomableEfectivo;
 
   useEffect(() => {
     if (registro) {
@@ -146,6 +164,30 @@ export default function VacacionForm({ empleados, registro, onDone }) {
           placeholder="RH, Histórico (CONTPAQi), etc."
         />
       </div>
+      {/* Aviso de saldo tomable del colaborador seleccionado */}
+      {calcSel && (
+        <div
+          className="text-xs border p-2"
+          style={{
+            background: excede
+              ? 'color-mix(in srgb, var(--c-bad) 10%, var(--c-paper))'
+              : 'var(--c-paper-head)',
+            borderColor: excede ? 'var(--c-bad)' : 'var(--c-rule)',
+            color: excede ? 'var(--c-bad)' : 'var(--c-ink-soft)',
+          }}
+        >
+          <strong>Tomable hoy:</strong>{' '}
+          <span className="font-mono">{tomableEfectivo}</span> día(s)
+          <span className="text-ink-faint"> (ya cerrados por aniversarios, D − E)</span>.
+          {excede && (
+            <div className="mt-1">
+              ⚠ Está intentando capturar <strong>{form.dias}</strong> día(s), más de los
+              tomables. Esto le dejará un saldo negativo (prestado del año en curso).
+            </div>
+          )}
+        </div>
+      )}
+
       {error && (
         <div className="text-bad text-xs border border-bad p-2" style={{background:'color-mix(in srgb, var(--c-bad) 10%, var(--c-paper))'}}>{error}</div>
       )}
