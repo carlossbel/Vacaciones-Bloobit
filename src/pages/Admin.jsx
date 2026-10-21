@@ -24,7 +24,7 @@ export default function Admin() {
   };
 
   const handleSeed = async () => {
-    if (!confirm('Sembrar los datos iniciales (11 colaboradores + 138 registros). Si ya existen con el mismo nombre, se omiten.')) return;
+    if (!confirm('Sembrar los datos iniciales (10 colaboradores + 146 registros de CONTPAQi). Si ya existen con los mismos datos, se omiten para evitar duplicados.')) return;
     setSeedState({ running: true, msg: 'Leyendo datos existentes…' });
     try {
       // 1) Empleados
@@ -81,7 +81,7 @@ export default function Admin() {
   return (
     <div className="space-y-6">
       <div className="sec-hd">
-        <span className="sec-num">6.</span>
+        <span className="sec-num">7.</span>
         <span className="sec-title">Administración</span>
       </div>
 
@@ -115,9 +115,9 @@ export default function Admin() {
         <h3 className="font-serif font-semibold text-[15px] mb-2">Sembrar datos iniciales</h3>
         <div className="bg-paper border border-rule p-4">
           <p className="text-[13px] text-ink-soft mb-3 max-w-[70ch]">
-            Carga los 11 colaboradores y 138 registros de vacaciones iniciales
-            (del Excel al 2026-10-19). Si ya existen entradas con los mismos datos,
-            se omiten para evitar duplicados.
+            Carga los 10 colaboradores y 146 registros de vacaciones oficiales
+            (de los kardex CONTPAQi al 2026-10-20). Si ya existen entradas con
+            los mismos datos, se omiten para evitar duplicados.
           </p>
           <button className="btn-primary" onClick={handleSeed} disabled={seedState.running}>
             {seedState.running ? 'Sembrando…' : 'Sembrar datos'}

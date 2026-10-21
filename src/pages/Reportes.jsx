@@ -67,7 +67,7 @@ export default function Reportes() {
   return (
     <div className="space-y-5">
       <div className="sec-hd">
-        <span className="sec-num">7.</span>
+        <span className="sec-num">6.</span>
         <span className="sec-title">Reportes</span>
       </div>
 

@@ -4,8 +4,8 @@ const NAV = [
   { to: '/',          label: 'Padrón',            num: '3' },
   { to: '/kardex',    label: 'Kardex Individual', num: '4' },
   { to: '/historial', label: 'Historial',         num: '5' },
-  { to: '/reportes',  label: 'Reportes',          num: '7' },
-  { to: '/admin',     label: 'Administración',    num: '6' },
+  { to: '/reportes',  label: 'Reportes',          num: '6' },
+  { to: '/admin',     label: 'Administración',    num: '7' },
 ];
 
 export default function Sidebar() {
