@@ -184,11 +184,11 @@ function KardexDocument({ empleado, calc, corte }) {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={3} className="text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}>
+                  <td colSpan={3} className="text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>
                     Total tomados en el aniversario
                   </td>
-                  <td className="num-c font-semibold bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}>{calc.I}</td>
-                  <td className="bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}></td>
+                  <td className="num-c font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>{calc.I}</td>
+                  <td className="bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}></td>
                 </tr>
               </tfoot>
             </table>

@@ -2,8 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ────────────────────────────────────────────────────────────
+   Palette tokens — light (default) y dark
+   ──────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --c-ink:         #0f1620;
+  --c-ink-soft:    #3b4454;
+  --c-ink-faint:   #6a7484;
+  --c-paper:       #ffffff;
+  --c-paper-dim:   #f4f5f7;
+  --c-paper-head:  #f8f9fb;
+  --c-rule:        #c7cdd5;
+  --c-rule-soft:   #e3e6ec;
+  --c-rule-strong: #2c3340;
+  --c-accent:      #1b3a5c;
+  --c-accent-tint: #e6edf4;
+  --c-accent-hover:#152e4a;
+  --c-ok:          #276230;
+  --c-warn:        #96530e;
+  --c-bad:         #a52424;
+}
+
+/* Dark explícito (toggle manual) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-ink:         #e8ebef;
+  --c-ink-soft:    #a8b0bd;
+  --c-ink-faint:   #6a7484;
+  --c-paper:       #141a22;
+  --c-paper-dim:   #0b0f14;
+  --c-paper-head:  #1a2029;
+  --c-rule:        #2a2f3a;
+  --c-rule-soft:   #1f242e;
+  --c-rule-strong: #4a5160;
+  --c-accent:      #7bb0e8;
+  --c-accent-tint: #1a2a3e;
+  --c-accent-hover:#9bc5f0;
+  --c-ok:          #7bc47f;
+  --c-warn:        #d4a157;
+  --c-bad:         #e07373;
+}
+
+/* Dark por preferencia del sistema (si no hay toggle explícito) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --c-ink:         #e8ebef;
+    --c-ink-soft:    #a8b0bd;
+    --c-ink-faint:   #6a7484;
+    --c-paper:       #141a22;
+    --c-paper-dim:   #0b0f14;
+    --c-paper-head:  #1a2029;
+    --c-rule:        #2a2f3a;
+    --c-rule-soft:   #1f242e;
+    --c-rule-strong: #4a5160;
+    --c-accent:      #7bb0e8;
+    --c-accent-tint: #1a2a3e;
+    --c-accent-hover:#9bc5f0;
+    --c-ok:          #7bc47f;
+    --c-warn:        #d4a157;
+    --c-bad:         #e07373;
+  }
+}
+
 @layer base {
-  html { color-scheme: light; }
   body {
     @apply bg-paper-dim text-ink font-sans antialiased;
     font-size: 14px;
@@ -14,13 +77,18 @@
   button { cursor: pointer; }
   table { border-collapse: collapse; }
   :focus-visible {
-    outline: 2px solid #1b3a5c;
+    outline: 2px solid var(--c-accent);
     outline-offset: 2px;
+  }
+
+  /* Form controls — adaptación dark */
+  input[type="date"], input[type="text"], input[type="number"], input[type="search"],
+  select, textarea {
+    color-scheme: inherit;
   }
 }
 
 @layer components {
-  /* Botones */
   .btn {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold tracking-wide uppercase border transition-colors;
   }
@@ -31,10 +99,12 @@
     @apply btn bg-paper text-ink border-rule hover:bg-paper-head;
   }
   .btn-danger {
-    @apply btn bg-paper text-bad border-rule hover:bg-red-50;
+    @apply btn bg-paper text-bad border-rule;
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-8 h-8 border border-rule bg-paper text-ink hover:bg-paper-head transition-colors;
   }
 
-  /* Inputs */
   .input, .select {
     @apply bg-paper text-ink border border-rule px-2.5 py-1.5 text-sm;
   }
@@ -46,7 +116,6 @@
     @apply block text-[11px] uppercase tracking-wider text-ink-faint font-semibold mb-1;
   }
 
-  /* Tablas */
   .tbl-wrap {
     @apply overflow-x-auto border border-rule bg-paper;
   }
@@ -54,13 +123,15 @@
     @apply w-full text-[12.5px];
   }
   table.data th, table.data td {
-    @apply px-2.5 py-1.5 text-left border-r border-b border-rule-soft align-middle;
+    @apply px-2.5 py-1.5 text-left align-middle;
+    border-right: 1px solid var(--c-rule-soft);
+    border-bottom: 1px solid var(--c-rule-soft);
   }
   table.data th:last-child, table.data td:last-child { @apply border-r-0; }
   table.data tbody tr:last-child td { @apply border-b-0; }
   table.data thead th {
     @apply bg-paper-head font-semibold uppercase tracking-wider text-[10.5px] text-ink-soft whitespace-nowrap;
-    border-bottom: 1.5px solid #2c3340;
+    border-bottom: 1.5px solid var(--c-rule-strong);
   }
   table.data tbody tr:nth-child(even) td { @apply bg-paper-head; }
   table.data tbody tr.clickable { @apply cursor-pointer; }
@@ -72,19 +143,38 @@
     @apply font-mono text-center tabular-nums;
   }
 
-  /* Section titles */
   .sec-hd {
     @apply flex items-baseline gap-2 mb-3 pb-1.5;
-    border-bottom: 1px solid #2c3340;
+    border-bottom: 1px solid var(--c-rule-strong);
   }
   .sec-num { @apply font-serif font-semibold text-accent text-[18px]; }
   .sec-title { @apply font-serif font-semibold text-[18px]; }
   .sec-note { @apply ml-auto text-[11px] text-ink-faint tracking-wide; }
 }
 
-/* Document / print styles */
+/* ────────────────────────────────────────────────────────────
+   Impresión — forzar paleta clara al imprimir, aun en dark
+   ──────────────────────────────────────────────────────────── */
 @media print {
-  body { @apply bg-white; }
+  :root, :root[data-theme="dark"] {
+    color-scheme: light;
+    --c-ink:         #0f1620;
+    --c-ink-soft:    #3b4454;
+    --c-ink-faint:   #6a7484;
+    --c-paper:       #ffffff;
+    --c-paper-dim:   #ffffff;
+    --c-paper-head:  #f0f0eb;
+    --c-rule:        #666666;
+    --c-rule-soft:   #cccccc;
+    --c-rule-strong: #2c3340;
+    --c-accent:      #1b3a5c;
+    --c-accent-tint: #e6edf4;
+    --c-accent-hover:#152e4a;
+    --c-ok:          #276230;
+    --c-warn:        #96530e;
+    --c-bad:         #a52424;
+  }
+  body { background: #fff !important; }
   .no-print { display: none !important; }
   .print-only { display: block !important; }
   .kardex-doc { border: none !important; max-width: 100% !important; }

@@ -221,9 +221,9 @@ function ReporteRango({ registros, desde, hasta }) {
           {registros.length > 0 && (
             <tfoot>
               <tr>
-                <td colSpan={3} className="text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}>Total</td>
-                <td className="num-c font-semibold bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}>{total}</td>
-                <td className="bg-paper-head" style={{borderTop:'1.5px solid #2c3340'}}></td>
+                <td colSpan={3} className="text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>Total</td>
+                <td className="num-c font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>{total}</td>
+                <td className="bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}></td>
               </tr>
             </tfoot>
           )}

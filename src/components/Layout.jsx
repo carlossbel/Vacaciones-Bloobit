@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
+import ThemeToggle from './ThemeToggle';
 import { useConfig } from '../hooks/useConfig';
 import { fmtDate } from '../lib/format';
 
@@ -32,6 +33,7 @@ export default function Layout() {
             <span className="text-[11px] text-ink-faint hidden md:inline">
               {fmtDate(config.corte)}
             </span>
+            <ThemeToggle />
           </div>
         </header>
 

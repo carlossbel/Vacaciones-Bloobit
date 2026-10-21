@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx}'],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
@@ -9,29 +10,31 @@ export default {
         mono: ['IBM Plex Mono', 'ui-monospace', 'Consolas', 'monospace'],
       },
       colors: {
+        // Todas las paletas apuntan a tokens CSS definidos en index.css,
+        // así cambiar de light a dark solo cambia las variables.
         ink: {
-          DEFAULT: '#0f1620',
-          soft: '#3b4454',
-          faint: '#6a7484',
+          DEFAULT: 'var(--c-ink)',
+          soft:    'var(--c-ink-soft)',
+          faint:   'var(--c-ink-faint)',
         },
         paper: {
-          DEFAULT: '#ffffff',
-          dim: '#f4f5f7',
-          head: '#f8f9fb',
+          DEFAULT: 'var(--c-paper)',
+          dim:     'var(--c-paper-dim)',
+          head:    'var(--c-paper-head)',
         },
         rule: {
-          DEFAULT: '#c7cdd5',
-          soft: '#e3e6ec',
-          strong: '#2c3340',
+          DEFAULT: 'var(--c-rule)',
+          soft:    'var(--c-rule-soft)',
+          strong:  'var(--c-rule-strong)',
         },
         accent: {
-          DEFAULT: '#1b3a5c',
-          tint: '#e6edf4',
-          hover: '#152e4a',
+          DEFAULT: 'var(--c-accent)',
+          tint:    'var(--c-accent-tint)',
+          hover:   'var(--c-accent-hover)',
         },
-        ok: '#276230',
-        warn: '#96530e',
-        bad: '#a52424',
+        ok:   'var(--c-ok)',
+        warn: 'var(--c-warn)',
+        bad:  'var(--c-bad)',
       },
       maxWidth: {
         doc: '960px',

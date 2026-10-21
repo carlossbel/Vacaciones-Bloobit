@@ -147,7 +147,7 @@ export default function VacacionForm({ empleados, registro, onDone }) {
         />
       </div>
       {error && (
-        <div className="text-bad text-xs border border-bad/40 bg-red-50 p-2">{error}</div>
+        <div className="text-bad text-xs border border-bad p-2" style={{background:'color-mix(in srgb, var(--c-bad) 10%, var(--c-paper))'}}>{error}</div>
       )}
       <div className="flex gap-2 justify-end pt-2 border-t border-rule-soft">
         <button type="button" className="btn-ghost" onClick={() => onDone?.()}>
