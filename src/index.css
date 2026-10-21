@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { color-scheme: light; }
+  body {
+    @apply bg-paper-dim text-ink font-sans antialiased;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4 { @apply font-serif text-ink; }
+  input, select, textarea, button { font-family: inherit; }
+  button { cursor: pointer; }
+  table { border-collapse: collapse; }
+  :focus-visible {
+    outline: 2px solid #1b3a5c;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Botones */
+  .btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold tracking-wide uppercase border transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-white border-accent hover:bg-accent-hover;
+  }
+  .btn-ghost {
+    @apply btn bg-paper text-ink border-rule hover:bg-paper-head;
+  }
+  .btn-danger {
+    @apply btn bg-paper text-bad border-rule hover:bg-red-50;
+  }
+
+  /* Inputs */
+  .input, .select {
+    @apply bg-paper text-ink border border-rule px-2.5 py-1.5 text-sm;
+  }
+  .input:focus, .select:focus {
+    @apply border-accent;
+    outline: 0;
+  }
+  .label {
+    @apply block text-[11px] uppercase tracking-wider text-ink-faint font-semibold mb-1;
+  }
+
+  /* Tablas */
+  .tbl-wrap {
+    @apply overflow-x-auto border border-rule bg-paper;
+  }
+  table.data {
+    @apply w-full text-[12.5px];
+  }
+  table.data th, table.data td {
+    @apply px-2.5 py-1.5 text-left border-r border-b border-rule-soft align-middle;
+  }
+  table.data th:last-child, table.data td:last-child { @apply border-r-0; }
+  table.data tbody tr:last-child td { @apply border-b-0; }
+  table.data thead th {
+    @apply bg-paper-head font-semibold uppercase tracking-wider text-[10.5px] text-ink-soft whitespace-nowrap;
+    border-bottom: 1.5px solid #2c3340;
+  }
+  table.data tbody tr:nth-child(even) td { @apply bg-paper-head; }
+  table.data tbody tr.clickable { @apply cursor-pointer; }
+  table.data tbody tr.clickable:hover td { @apply bg-accent-tint; }
+  table.data .num {
+    @apply font-mono text-right tabular-nums whitespace-nowrap;
+  }
+  table.data .num-c {
+    @apply font-mono text-center tabular-nums;
+  }
+
+  /* Section titles */
+  .sec-hd {
+    @apply flex items-baseline gap-2 mb-3 pb-1.5;
+    border-bottom: 1px solid #2c3340;
+  }
+  .sec-num { @apply font-serif font-semibold text-accent text-[18px]; }
+  .sec-title { @apply font-serif font-semibold text-[18px]; }
+  .sec-note { @apply ml-auto text-[11px] text-ink-faint tracking-wide; }
+}
+
+/* Document / print styles */
+@media print {
+  body { @apply bg-white; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  .kardex-doc { border: none !important; max-width: 100% !important; }
+  @page { margin: 1.5cm; size: letter; }
+}
+.print-only { display: none; }

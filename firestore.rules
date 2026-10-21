@@ -1,0 +1,10 @@
+// Reglas básicas para desarrollo. Endurecer con Auth antes de producción.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TODO: cambiar por request.auth != null una vez conectada Auth
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
