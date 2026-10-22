@@ -27,17 +27,19 @@ export default function Login() {
         <form onSubmit={submit} className="p-6 space-y-4">
           <div>
             <label className="label" htmlFor="u">Usuario</label>
-            <input
+            <select
               id="u"
-              type="text"
               autoFocus
-              autoComplete="username"
               required
-              className="input w-full"
+              className="select w-full"
               value={u}
               onChange={(e) => setU(e.target.value)}
-              placeholder="barbara, angelica o carlos"
-            />
+            >
+              <option value="">— selecciona —</option>
+              <option value="barbara">Bárbara Pérez · Recursos Humanos</option>
+              <option value="angelica">Angélica Luna · Contadora</option>
+              <option value="carlos">Carlos Beltrán · IT</option>
+            </select>
           </div>
           <div>
             <label className="label" htmlFor="p">Contraseña</label>
