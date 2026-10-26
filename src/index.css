@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 /* ────────────────────────────────────────────────────────────
-   Palette tokens — light (default) y dark
+   Palette tokens — base neutra + 6 paletas de color (acento).
+   El acento vive en 3 variables (--c-accent, -tint, -hover)
+   que se redefinen según data-accent="..." en :root.
    ──────────────────────────────────────────────────────────── */
+
+/* ── BASE NEUTRA · modo claro ── */
 :root {
   color-scheme: light;
   --c-ink:         #0f1620;
@@ -16,15 +20,16 @@
   --c-rule:        #c7cdd5;
   --c-rule-soft:   #e3e6ec;
   --c-rule-strong: #2c3340;
-  --c-accent:      #1b3a5c;
-  --c-accent-tint: #e6edf4;
-  --c-accent-hover:#152e4a;
   --c-ok:          #276230;
   --c-warn:        #96530e;
   --c-bad:         #a52424;
+  /* Acento default (navy, light) — se sobreescribe abajo según data-accent */
+  --c-accent:      #1b3a5c;
+  --c-accent-tint: #e6edf4;
+  --c-accent-hover:#152e4a;
 }
 
-/* Dark explícito (toggle manual) */
+/* ── BASE NEUTRA · modo oscuro ── */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --c-ink:         #e8ebef;
@@ -36,15 +41,13 @@
   --c-rule:        #2a2f3a;
   --c-rule-soft:   #1f242e;
   --c-rule-strong: #4a5160;
-  --c-accent:      #7bb0e8;
-  --c-accent-tint: #1a2a3e;
-  --c-accent-hover:#9bc5f0;
   --c-ok:          #7bc47f;
   --c-warn:        #d4a157;
   --c-bad:         #e07373;
+  --c-accent:      #7bb0e8;
+  --c-accent-tint: #1a2a3e;
+  --c-accent-hover:#9bc5f0;
 }
-
-/* Dark por preferencia del sistema (si no hay toggle explícito) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
@@ -57,13 +60,62 @@
     --c-rule:        #2a2f3a;
     --c-rule-soft:   #1f242e;
     --c-rule-strong: #4a5160;
-    --c-accent:      #7bb0e8;
-    --c-accent-tint: #1a2a3e;
-    --c-accent-hover:#9bc5f0;
     --c-ok:          #7bc47f;
     --c-warn:        #d4a157;
     --c-bad:         #e07373;
+    --c-accent:      #7bb0e8;
+    --c-accent-tint: #1a2a3e;
+    --c-accent-hover:#9bc5f0;
   }
+}
+
+/* ────────────────────────────────────────────────────────────
+   PALETAS DE ACENTO
+   Cada paleta define los 3 tokens para light y para dark.
+   Nota: los selectores dark cubren tanto [data-theme="dark"]
+   como :root:not([data-theme="light"]) bajo prefers-color-scheme.
+   ──────────────────────────────────────────────────────────── */
+
+/* Navy — default corporativo */
+:root[data-accent="navy"] { --c-accent: #1b3a5c; --c-accent-tint: #e6edf4; --c-accent-hover: #152e4a; }
+:root[data-accent="navy"][data-theme="dark"],
+:root[data-accent="navy"]:not([data-theme="light"]) {
+  --c-accent: #7bb0e8; --c-accent-tint: #1a2a3e; --c-accent-hover: #9bc5f0;
+}
+
+/* Esmeralda — verde profesional */
+:root[data-accent="emerald"] { --c-accent: #0f6c4b; --c-accent-tint: #e2f1ea; --c-accent-hover: #0a553a; }
+:root[data-accent="emerald"][data-theme="dark"],
+:root[data-accent="emerald"]:not([data-theme="light"]) {
+  --c-accent: #5bc48a; --c-accent-tint: #142a1f; --c-accent-hover: #7ad7a2;
+}
+
+/* Granate — rojo vino, elegante */
+:root[data-accent="burgundy"] { --c-accent: #8b1e3f; --c-accent-tint: #f3e3e9; --c-accent-hover: #6e162f; }
+:root[data-accent="burgundy"][data-theme="dark"],
+:root[data-accent="burgundy"]:not([data-theme="light"]) {
+  --c-accent: #e07090; --c-accent-tint: #2e1620; --c-accent-hover: #ec8ca9;
+}
+
+/* Violeta — morado profundo */
+:root[data-accent="violet"] { --c-accent: #513688; --c-accent-tint: #ece6f5; --c-accent-hover: #3f2970; }
+:root[data-accent="violet"][data-theme="dark"],
+:root[data-accent="violet"]:not([data-theme="light"]) {
+  --c-accent: #a088e0; --c-accent-tint: #241b36; --c-accent-hover: #b7a3eb;
+}
+
+/* Ámbar — dorado terroso */
+:root[data-accent="amber"] { --c-accent: #a0620b; --c-accent-tint: #f6ead3; --c-accent-hover: #815008; }
+:root[data-accent="amber"][data-theme="dark"],
+:root[data-accent="amber"]:not([data-theme="light"]) {
+  --c-accent: #e2a94e; --c-accent-tint: #30210d; --c-accent-hover: #eebf74;
+}
+
+/* Grafito — monocromo elegante, sin color */
+:root[data-accent="graphite"] { --c-accent: #2c3340; --c-accent-tint: #e8eaf0; --c-accent-hover: #1a1f28; }
+:root[data-accent="graphite"][data-theme="dark"],
+:root[data-accent="graphite"]:not([data-theme="light"]) {
+  --c-accent: #c8ced6; --c-accent-tint: #262b36; --c-accent-hover: #e0e4ea;
 }
 
 @layer base {

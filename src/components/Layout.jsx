@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import ThemeToggle from './ThemeToggle';
+import AppearanceMenu from './AppearanceMenu';
 import { useConfig } from '../hooks/useConfig';
 import { useAuth, ROL_LABEL } from '../context/AuthContext';
 import { fmtDate } from '../lib/format';
@@ -34,7 +34,7 @@ export default function Layout() {
             <span className="text-[11px] text-ink-faint hidden md:inline">
               {fmtDate(config.corte)}
             </span>
-            <ThemeToggle />
+            <AppearanceMenu />
             {user && (
               <div className="flex items-center gap-2 md:hidden">
                 <span className="text-[11px] text-ink-soft">
