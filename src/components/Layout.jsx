@@ -3,11 +3,13 @@ import Sidebar from './Sidebar';
 import AppearanceMenu from './AppearanceMenu';
 import { useConfig } from '../hooks/useConfig';
 import { useAuth, ROL_LABEL } from '../context/AuthContext';
-import { fmtDate } from '../lib/format';
+import { fmtDate, todayISO } from '../lib/format';
 
 export default function Layout() {
   const { config, updateConfig } = useConfig();
   const { user, logout } = useAuth();
+  const hoy = todayISO();
+  const corteEnPasado = config.corte && config.corte < hoy;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -22,18 +24,26 @@ export default function Layout() {
               LFT Art. 76 · Bloobit México
             </p>
           </div>
-          <div className="ml-auto flex items-center gap-3 flex-wrap">
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
             <label htmlFor="corte" className="label mb-0">Día de corte</label>
             <input
               id="corte"
               type="date"
-              className="input font-mono"
+              className={`input font-mono ${corteEnPasado ? 'border-warn' : ''}`}
               value={config.corte}
               onChange={(e) => updateConfig({ corte: e.target.value })}
+              title={corteEnPasado ? 'La fecha de corte está en el pasado — los registros capturados después no aparecen' : ''}
             />
-            <span className="text-[11px] text-ink-faint hidden md:inline">
-              {fmtDate(config.corte)}
-            </span>
+            {corteEnPasado && (
+              <button
+                type="button"
+                className="btn-ghost text-warn border-warn"
+                onClick={() => updateConfig({ corte: hoy })}
+                title="Mover la fecha de corte a hoy"
+              >
+                Hoy
+              </button>
+            )}
             <AppearanceMenu />
             {user && (
               <div className="flex items-center gap-2 md:hidden">

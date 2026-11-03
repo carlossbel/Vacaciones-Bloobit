@@ -126,39 +126,18 @@ function KardexDocument({ empleado, calc, corte }) {
 
       {/* Registros del año aniversario en curso */}
       <section className="px-6 py-4 border-b border-rule">
-        <h4 className="font-serif font-semibold text-[15px] mb-2">
-          Vacaciones del año aniversario en curso
+        <h4 className="font-serif font-semibold text-[15px] mb-2 flex items-baseline justify-between">
+          <span>Vacaciones del año aniversario en curso</span>
+          <span className="text-[11px] text-ink-faint font-sans font-normal">
+            {calc.histAnio.length} registro{calc.histAnio.length === 1 ? '' : 's'}
+          </span>
         </h4>
         {calc.histAnio.length === 0 ? (
           <p className="text-[12px] text-ink-faint italic">
             Sin registros capturados en el año aniversario actual.
           </p>
         ) : (
-          <TablaRegistros rows={calc.histAnio} total={calc.I} totalLabel="Total del año" />
-        )}
-      </section>
-
-      {/* Historial completo (todos los años) */}
-      <section className="px-6 py-4 border-b border-rule">
-        <h4 className="font-serif font-semibold text-[15px] mb-2 flex items-baseline justify-between">
-          <span>Historial completo de vacaciones</span>
-          <span className="text-[11px] text-ink-faint font-sans font-normal">
-            {calc.histEmp.length} registro{calc.histEmp.length === 1 ? '' : 's'}
-          </span>
-        </h4>
-        {calc.histEmp.length === 0 ? (
-          <p className="text-[12px] text-ink-faint italic">
-            Sin registros capturados.
-          </p>
-        ) : (
-          <TablaRegistros
-            rows={[...calc.histEmp].sort(
-              (a, b) => (a.inicio || '').localeCompare(b.inicio || '')
-            )}
-            total={calc.histEmp.reduce((s, h) => s + (Number(h.dias) || 0), 0)}
-            totalLabel="Total histórico"
-            withNotas
-          />
+          <TablaRegistros rows={calc.histAnio} total={calc.I} totalLabel="Total del año" withNotas />
         )}
       </section>
 
