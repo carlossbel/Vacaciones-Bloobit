@@ -134,30 +134,31 @@ function KardexDocument({ empleado, calc, corte }) {
             Sin registros capturados en el año aniversario actual.
           </p>
         ) : (
-          <table className="w-full border-collapse text-[12.5px]">
-            <thead>
-              <tr>
-                <th className="text-left py-1.5 px-2 border-b border-rule-strong text-[10.5px] uppercase tracking-wider text-ink-faint font-semibold bg-paper-head w-12">#</th>
-                <th className="text-left py-1.5 px-2 border-b border-rule-strong text-[10.5px] uppercase tracking-wider text-ink-faint font-semibold bg-paper-head">Fecha inicial</th>
-                <th className="text-left py-1.5 px-2 border-b border-rule-strong text-[10.5px] uppercase tracking-wider text-ink-faint font-semibold bg-paper-head">Fecha final</th>
-                <th className="text-right py-1.5 px-2 border-b border-rule-strong text-[10.5px] uppercase tracking-wider text-ink-faint font-semibold bg-paper-head w-20">Días</th>
-              </tr>
-            </thead>
-            <tbody>
-              {calc.histAnio.map((h, i) => (
-                <tr key={i} className="k-row">
-                  <td className="py-1.5 px-2 border-b border-rule-soft font-mono text-center">{i + 1}</td>
-                  <td className="py-1.5 px-2 border-b border-rule-soft font-mono">{fmtDate(h.inicio)}</td>
-                  <td className="py-1.5 px-2 border-b border-rule-soft font-mono">{fmtDate(h.fin)}</td>
-                  <td className="py-1.5 px-2 border-b border-rule-soft font-mono text-right">{h.dias}</td>
-                </tr>
-              ))}
-              <tr>
-                <td colSpan={3} className="py-1.5 px-2 text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>Total del año</td>
-                <td className="py-1.5 px-2 font-mono text-right font-semibold bg-paper-head" style={{borderTop:'1.5px solid var(--c-rule-strong)'}}>{calc.I}</td>
-              </tr>
-            </tbody>
-          </table>
+          <TablaRegistros rows={calc.histAnio} total={calc.I} totalLabel="Total del año" />
+        )}
+      </section>
+
+      {/* Historial completo (todos los años) */}
+      <section className="px-6 py-4 border-b border-rule">
+        <h4 className="font-serif font-semibold text-[15px] mb-2 flex items-baseline justify-between">
+          <span>Historial completo de vacaciones</span>
+          <span className="text-[11px] text-ink-faint font-sans font-normal">
+            {calc.histEmp.length} registro{calc.histEmp.length === 1 ? '' : 's'}
+          </span>
+        </h4>
+        {calc.histEmp.length === 0 ? (
+          <p className="text-[12px] text-ink-faint italic">
+            Sin registros capturados.
+          </p>
+        ) : (
+          <TablaRegistros
+            rows={[...calc.histEmp].sort(
+              (a, b) => (a.inicio || '').localeCompare(b.inicio || '')
+            )}
+            total={calc.histEmp.reduce((s, h) => s + (Number(h.dias) || 0), 0)}
+            totalLabel="Total histórico"
+            withNotas
+          />
         )}
       </section>
 
@@ -185,6 +186,59 @@ function KV({ k, v, wide = false }) {
     <div className={`flex justify-between py-1 border-b border-rule-soft gap-3 ${wide ? '' : ''}`}>
       <span className="text-[11px] uppercase tracking-wider text-ink-faint font-semibold">{k}</span>
       <span className="font-mono text-[12.5px] text-right">{v}</span>
+    </div>
+  );
+}
+
+function TablaRegistros({ rows, total, totalLabel, withNotas = false }) {
+  const th =
+    'text-left py-1.5 px-2 border-b border-rule-strong text-[10.5px] uppercase tracking-wider text-ink-faint font-semibold bg-paper-head';
+  const td = 'py-1 px-2 border-b border-rule-soft font-mono';
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-[12px]">
+        <thead>
+          <tr>
+            <th className={`${th} w-10`}>#</th>
+            <th className={th}>Fecha inicial</th>
+            <th className={th}>Fecha final</th>
+            <th className={`${th} text-right w-16`}>Días</th>
+            {withNotas && <th className={th}>Origen</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((h, i) => (
+            <tr key={h.id ?? i}>
+              <td className={`${td} text-center`}>{i + 1}</td>
+              <td className={td}>{fmtDate(h.inicio)}</td>
+              <td className={td}>{fmtDate(h.fin)}</td>
+              <td className={`${td} text-right`}>{h.dias}</td>
+              {withNotas && <td className={`${td} font-sans`}>{h.notas}</td>}
+            </tr>
+          ))}
+          <tr>
+            <td
+              colSpan={withNotas ? 3 : 3}
+              className="py-1.5 px-2 text-right font-semibold bg-paper-head font-sans"
+              style={{ borderTop: '1.5px solid var(--c-rule-strong)' }}
+            >
+              {totalLabel}
+            </td>
+            <td
+              className="py-1.5 px-2 font-mono text-right font-semibold bg-paper-head"
+              style={{ borderTop: '1.5px solid var(--c-rule-strong)' }}
+            >
+              {total}
+            </td>
+            {withNotas && (
+              <td
+                className="bg-paper-head"
+                style={{ borderTop: '1.5px solid var(--c-rule-strong)' }}
+              />
+            )}
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }
