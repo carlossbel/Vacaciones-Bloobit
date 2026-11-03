@@ -179,11 +179,16 @@ export function calcularVacaciones(empleado, corte, historial = [], corteKardex 
   const diasTranscurridos = daysBetween(anivStart, corteDate);
   const H = (G * diasTranscurridos) / DIAS_AÑO;
 
-  // I — Tomados DURANTE el año aniversario actual (informativo)
+  // I — Tomados / programados DURANTE el año aniversario actual.
+  //   Incluimos TODOS los registros con fecha de inicio dentro del rango
+  //   [anivStart, anivEnd), aunque sean futuros respecto al corte — así se
+  //   contemplan las vacaciones ya autorizadas que aún no transcurren
+  //   (misma lógica que CONTPAQi: el "tomado" cuenta cualquier registro
+  //   capturado, no solo el pasado).
   const histAnio = histEmp
     .filter((h) => {
       const d = parseDate(h.inicio);
-      return d && d >= anivStart && d <= corteDate;
+      return d && d >= anivStart && d < anivEnd;
     })
     .sort((a, b) => parseDate(a.inicio) - parseDate(b.inicio));
   const I = histAnio.reduce((s, h) => s + (Number(h.dias) || 0), 0);
