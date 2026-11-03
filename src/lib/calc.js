@@ -167,7 +167,11 @@ export function calcularVacaciones(empleado, corte, historial = [], corteKardex 
   const D = (Number(empleado.L) || 0) + extraDias;
 
   // E — Total tomados = baseline M + suma de historial del empleado
-  const histEmp = historial.filter((h) => h.nombre === empleado.nombre);
+  //   Matching tolerante: sin acentos, minúsculas y trim, por si el nombre
+  //   capturado en un registro no coincide carácter a carácter con el del padrón.
+  const nk = (s) => (s ?? '').toString().normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const empKey = nk(empleado.nombre);
+  const histEmp = historial.filter((h) => nk(h.nombre) === empKey);
   const sumHist = histEmp.reduce((s, h) => s + (Number(h.dias) || 0), 0);
   const E = (Number(empleado.M) || 0) + sumHist;
 

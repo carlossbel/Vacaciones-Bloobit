@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useCollection } from '../hooks/useCollection';
 import { useAuth } from '../context/AuthContext';
 import { deleteDoc, doc, db, COL } from '../firebase';
-import { fmtDate } from '../lib/format';
+import { fmtDate, normNombre } from '../lib/format';
 import Modal from '../components/Modal';
 import VacacionForm from '../components/VacacionForm';
 
@@ -15,15 +15,46 @@ export default function Historial() {
   const [editing, setEditing] = useState(null);
   const [newOpen, setNewOpen] = useState(false);
 
+  // Nombres únicos del historial (para detectar huérfanos)
+  const nombresEnHistorial = useMemo(() => {
+    const map = new Map();  // key normalizada → {display, count}
+    for (const h of historial) {
+      const k = normNombre(h.nombre);
+      if (!k) continue;
+      const prev = map.get(k);
+      if (prev) prev.count++;
+      else map.set(k, { display: (h.nombre || '').trim(), count: 1 });
+    }
+    return map;
+  }, [historial]);
+
+  // Set de nombres del padrón (normalizados), para marcar huérfanos
+  const nombresPadron = useMemo(
+    () => new Set(empleados.map((e) => normNombre(e.nombre))),
+    [empleados]
+  );
+
+  // Lista final del select: empleados activos + huérfanos del historial
+  const opciones = useMemo(() => {
+    const act = empleados
+      .filter((e) => e.activo !== false)
+      .map((e) => ({ nombre: e.nombre, huerfano: false }));
+    const huerfanos = [...nombresEnHistorial.entries()]
+      .filter(([k]) => !nombresPadron.has(k))
+      .map(([, v]) => ({ nombre: v.display, huerfano: true, count: v.count }));
+    return { act, huerfanos };
+  }, [empleados, nombresEnHistorial, nombresPadron]);
+
   const years = useMemo(
     () => [...new Set(historial.map((h) => (h.inicio || '').slice(0, 4)))].filter(Boolean).sort(),
     [historial]
   );
 
   const rows = useMemo(() => {
+    const colabKey = normNombre(colab);
     return historial
       .filter((h) => {
-        const mc = !colab || h.nombre === colab;
+        const mc = !colab || normNombre(h.nombre) === colabKey;
         const my = !year  || (h.inicio || '').startsWith(year);
         return mc && my;
       })
@@ -36,6 +67,12 @@ export default function Historial() {
     if (!confirm('¿Eliminar este registro? No se puede deshacer.')) return;
     await deleteDoc(doc(db, COL.historial, id));
   };
+
+  // Si el nombre seleccionado es "huérfano" (no coincide exacto con ningún empleado),
+  // ofrecemos re-asignarlo al nombre oficial del padrón.
+  const colabEsHuerfano =
+    colab &&
+    opciones.huerfanos.some((o) => normNombre(o.nombre) === normNombre(colab));
 
   return (
     <div className="space-y-4">
@@ -50,14 +87,25 @@ export default function Historial() {
         <div>
           <label className="label">Colaborador</label>
           <select
-            className="select min-w-[220px]"
+            className="select min-w-[260px]"
             value={colab}
             onChange={(e) => setColab(e.target.value)}
           >
             <option value="">— Todos —</option>
-            {empleados.map((e) => (
-              <option key={e.id} value={e.nombre}>{e.nombre}</option>
-            ))}
+            <optgroup label="Padrón activo">
+              {opciones.act.map((o) => (
+                <option key={o.nombre} value={o.nombre}>{o.nombre}</option>
+              ))}
+            </optgroup>
+            {opciones.huerfanos.length > 0 && (
+              <optgroup label="Otros nombres en historial">
+                {opciones.huerfanos.map((o) => (
+                  <option key={o.nombre} value={o.nombre}>
+                    {o.nombre} ({o.count})
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </select>
         </div>
         <div>
@@ -79,6 +127,16 @@ export default function Historial() {
         )}
       </div>
 
+      {colabEsHuerfano && (
+        <div
+          className="text-[12px] p-2 border border-warn"
+          style={{ background: 'color-mix(in srgb, var(--c-warn) 8%, var(--c-paper))', color: 'var(--c-warn)' }}
+        >
+          ⚠ "{colab}" aparece en el historial pero no está escrito igual que en el
+          padrón. Los cálculos del kardex pueden omitir estos registros. Si {canWrite ? 'quieres, puedes editarlos y seleccionar al colaborador correcto del desplegable para corregir el nombre.' : 'pide a RH o IT que los corrija.'}
+        </div>
+      )}
+
       {lh ? (
         <div className="text-center text-ink-faint py-8">Cargando…</div>
       ) : (
@@ -95,23 +153,33 @@ export default function Historial() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((h) => (
-                <tr key={h.id}>
-                  <td className="font-medium">{h.nombre}</td>
-                  <td className="font-mono text-[12px]">{fmtDate(h.inicio)}</td>
-                  <td className="font-mono text-[12px]">{fmtDate(h.fin)}</td>
-                  <td className="num-c">{h.dias}</td>
-                  <td>{h.notas}</td>
-                  {canWrite && (
-                    <td className="num-c no-print whitespace-nowrap">
-                      <button className="text-accent hover:underline text-[11px] mr-2"
-                              onClick={() => setEditing(h)}>Editar</button>
-                      <button className="text-bad hover:underline text-[11px]"
-                              onClick={() => handleDelete(h.id)}>Eliminar</button>
+              {rows.map((h) => {
+                const esHuerfano = !nombresPadron.has(normNombre(h.nombre));
+                return (
+                  <tr key={h.id}>
+                    <td className="font-medium">
+                      {h.nombre}
+                      {esHuerfano && (
+                        <span className="ml-2 text-[10px] text-warn uppercase tracking-wider" title="Nombre no coincide con el padrón">
+                          ⚠ fuera de padrón
+                        </span>
+                      )}
                     </td>
-                  )}
-                </tr>
-              ))}
+                    <td className="font-mono text-[12px]">{fmtDate(h.inicio)}</td>
+                    <td className="font-mono text-[12px]">{fmtDate(h.fin)}</td>
+                    <td className="num-c">{h.dias}</td>
+                    <td>{h.notas}</td>
+                    {canWrite && (
+                      <td className="num-c no-print whitespace-nowrap">
+                        <button className="text-accent hover:underline text-[11px] mr-2"
+                                onClick={() => setEditing(h)}>Editar</button>
+                        <button className="text-bad hover:underline text-[11px]"
+                                onClick={() => handleDelete(h.id)}>Eliminar</button>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
               {rows.length === 0 && (
                 <tr><td colSpan={canWrite ? 6 : 5} className="text-center text-ink-faint py-6">
                   Sin registros con los filtros actuales.

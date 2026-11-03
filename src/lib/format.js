@@ -22,3 +22,18 @@ export const fmtNum1 = (n) => {
 };
 
 export const todayISO = () => new Date().toISOString().slice(0, 10);
+
+/**
+ * Normaliza nombres para comparación tolerante:
+ * sin acentos, en minúsculas, sin espacios al inicio/fin, espacios internos colapsados.
+ * Útil cuando los registros del historial pueden tener grafías distintas
+ * ("Ana Garcia" vs "Ana García", espacios de más, mayúsculas diferentes).
+ */
+export const normNombre = (s) =>
+  (s ?? '')
+    .toString()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
